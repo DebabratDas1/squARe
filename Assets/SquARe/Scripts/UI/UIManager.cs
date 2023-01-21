@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using AndroidNativeCore;
 
 public class UIManager : MonoBehaviour
 {
@@ -117,6 +118,8 @@ public class UIManager : MonoBehaviour
 
         writepostPanel.SetActive(false);
         placePosterAnchorPanel.SetActive(false);
+
+        ;// RecentPosters.Singleton.RefreshRecentposters();
         //ARManager.Singleton.EnableAR(false);
     }
 
@@ -146,7 +149,16 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] public Button placePosterBtn;
 
+    public void ComingSoonToast()
+    {
+        Toast.make("Coming Soon...", Toast.LENGTH_SHORT);
+    }
 
+
+    [SerializeField] public GameObject fuelingPanel;
+
+
+    
 }
 
 

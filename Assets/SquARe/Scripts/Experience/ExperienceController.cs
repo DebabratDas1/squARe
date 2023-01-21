@@ -38,11 +38,13 @@ public class ExperienceController : MonoBehaviour
 
         var earthTrackingState = earthManager.EarthTrackingState;
         Debug.Log("TrackingState" + earthTrackingState);
+#if !UNITY_EDITOR
         if (earthTrackingState != TrackingState.Tracking)
         {
             AlertLocationError();
             return;
         }
+#endif
         var cameraGeospatialPose = earthManager.CameraGeospatialPose;
         //Debug.Log("AAAA");
 
@@ -95,22 +97,20 @@ public class ExperienceController : MonoBehaviour
                 {
                     isAccessable = true;
                 }
+                Debug.Log("Poster UserID : " + (string)posterOwner);
+                Debug.Log("User UserID : " + UserData.userID);
 
-                if ((bool)posterDeleted)
-                {
-                    isLive = false;
-                }
-                else
-                {
-                    isLive = true;
-                }
+                Debug.Log("Is poster Accessable : " + isAccessable);
+                isLive = !(bool)posterDeleted;
                 isPosterValid = isValidLon && isAccessable && isLive;
+                Debug.Log("Is Poster Deleted " + (bool)posterDeleted);
+                Debug.Log("Is Poster Valid to show : " + isPosterValid);
                 if (isPosterValid)
                 {
                     currentPostersCollection.Add(documentSnapshot.Id);
                 }
                 //Debug.Log(!previousPostersCollection.Contains(documentSnapshot.Id));
-                if (!previousPostersCollection.Contains(documentSnapshot.Id))
+                if (isPosterValid && !previousPostersCollection.Contains(documentSnapshot.Id))
                 {
                     
 
@@ -335,7 +335,9 @@ public class ExperienceController : MonoBehaviour
 
         if (newExpPoster != null)
         {
-            Button newBtn = newExpPoster.GetComponentInChildren<CanvasRenderer>().gameObject.AddComponent<Button>();
+            newExpPoster.GetComponentInChildren<Canvas>().sortingOrder = 100;
+            newExpPoster.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+            Button newBtn = newExpPoster.GetComponentInChildren<Canvas>().gameObject.AddComponent<Button>();
             newBtn.onClick.AddListener(PosterClicked);
             expPostersList.Add(newExpPoster);
         }
@@ -354,6 +356,7 @@ public class ExperienceController : MonoBehaviour
         }
         expPostersList.Clear();
         previousPostersCollection.Clear();
+        currentPostersCollection.Clear();
     }
 
     private IEnumerator SetPosterTransform(object posterLatitude, object posterLongitude, object posterAltitude, object posterScaleX, object posterScaleY, object posterScaleZ, GameObject newExpPoster)
@@ -440,10 +443,12 @@ public class ExperienceController : MonoBehaviour
        .setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked"); alert.dismiss(); })
        .show();
     }
-
+    [SerializeField] private GameObject actionPanel;
     public void PosterClicked()
     {
-        Toast.make("Poster Clicked", Toast.LENGTH_SHORT);
+        Debug.Log("Poster clicked");
+        Toast.make("Actions Coming Soon...", Toast.LENGTH_SHORT);
+        actionPanel.SetActive(true);
     }
 
     private void AlertLocationError()
@@ -453,7 +458,10 @@ public class ExperienceController : MonoBehaviour
        .setTitle("Earth Tracking Error")
        .setMessage("Confirm your device location turned on")
        .setIcon("alert_icon")
-       .setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked"); alert.dismiss(); })
+       .setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked");
+           ClearPreviousPosters();
+           UIManager.Singleton.CurrentUIState = UIStates.Home;
+           alert.dismiss(); })
        .show();
     }
 }

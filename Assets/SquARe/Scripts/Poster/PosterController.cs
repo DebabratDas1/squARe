@@ -114,7 +114,7 @@ public class PosterController : MonoBehaviour
         
     }
 
-
+    [SerializeField] private Toggle privacyButton;
     private GameObject SelectInitPosterTemplate()
     {
         if(posterTex!=null && !posterText.text.Equals(""))
@@ -126,6 +126,10 @@ public class PosterController : MonoBehaviour
             currentPoster.posterImagePath = pickedImagePath;
             currentPoster.posterText = posterText.text;
             currentPoster.posterImage = posterTex;
+            currentPoster.isPosterPrivate = privacyButton.isButtonStatePrivate;
+            Debug.Log("Button Privacy State" + privacyButton.isButtonStatePrivate);
+            Debug.Log("Poster Privacy State" + currentPoster.isPosterPrivate);
+
 
 
             return newPoster;
@@ -138,6 +142,7 @@ public class PosterController : MonoBehaviour
             currentPoster.posterImagePath = null;
             currentPoster.posterImage = null;
             currentPoster.posterText = posterText.text;
+            currentPoster.isPosterPrivate = privacyButton.isButtonStatePrivate;
 
             return newPoster;
         }
@@ -149,6 +154,7 @@ public class PosterController : MonoBehaviour
             currentPoster.posterImagePath = pickedImagePath;
             currentPoster.posterText = null;
             currentPoster.posterImage = posterTex;
+            currentPoster.isPosterPrivate = privacyButton.isButtonStatePrivate;
             return newPoster;
         }
         else
@@ -401,6 +407,7 @@ public class PosterController : MonoBehaviour
         else
         {
             currentPoster.PosterCurrentState = PosterState.Placing;
+            UIManager.Singleton.fuelingPanel.SetActive(true);
             DataUploader.Instance.UploadPoster1(currentPoster);
             //StartCoroutine(DataUploader.Instance.UploadPoster2(currentPoster));
 
@@ -449,13 +456,27 @@ public class PosterController : MonoBehaviour
     {
         if(currentPoster!=null && currentPoster.PosterCurrentState != PosterState.Placed)
         {
-            ClearNotPlacedPoster();
+            AlertDialog alert = new AlertDialog();
+            alert.build(AlertDialog.THEME_HOLO_DARK)
+           .setTitle("Poster Not Placed")
+           .setMessage("Do you really want to go back?")
+           .setIcon("alert_icon")
+           .setNegativeButtion("Yes", () => {
+               ClearNotPlacedPoster(); 
+               alert.dismiss(); 
+               UIManager.Singleton.CurrentUIState = UIStates.WritePost;
+           })
+           .setPositiveButtion("No", () => { alert.dismiss(); return; })
+           //.setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked"); alert.dismiss(); })
+           .show();
+           // ClearNotPlacedPoster();
         }
         if(currentPoster != null && currentPoster.PosterCurrentState == PosterState.Placed)
         {
             ClearPosterCreator();
+            UIManager.Singleton.CurrentUIState = UIStates.WritePost;
+
         }
-        UIManager.Singleton.CurrentUIState = UIStates.WritePost;
     }
 
     

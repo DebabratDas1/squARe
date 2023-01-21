@@ -65,11 +65,13 @@ public class DataUploader : MonoBehaviour
         { "ScaleX", posterScale.x },
         { "ScaleY", posterScale.y },
         { "ScaleZ", posterScale.z },
-        { "IsPrivate", false },
+        { "IsPrivate", _poster.isPosterPrivate },
         { "IsDeleted", false },
         { "Text", _poster.posterText },
         { "ImageUrl", _poster.posterImageUrl },
+        { "TimeStamp",DateTime.Now.ToString() },
 };
+        Debug.Log("Poster Uploading...Poster Privacy : " + _poster.isPosterPrivate);
 
         colRef.AddAsync(poster).ContinueWithOnMainThread(task =>
         {
@@ -236,14 +238,14 @@ public class DataUploader : MonoBehaviour
         { "ScaleX", posterScale.x },
         { "ScaleY", posterScale.y },
         { "ScaleZ", posterScale.z },
-        { "IsPrivate", false },
+        { "IsPrivate", _poster.isPosterPrivate },
         { "IsDeleted", false },
         { "Text", _poster.posterText },
         { "ImageUrl", _poster.posterImageUrl },
         { "TimeStamp",DateTime.Now.ToString() },
 };
 
-
+                            Debug.Log("Poster Uploading...Poster Privacy : " + _poster.isPosterPrivate);
 
                             colRef.AddAsync(poster).ContinueWithOnMainThread(task =>
                             {
@@ -252,6 +254,8 @@ public class DataUploader : MonoBehaviour
                             });
 
                             _poster.PosterCurrentState = PosterState.Placed;
+                            UIManager.Singleton.fuelingPanel.SetActive(false);
+
 
                         });
                         
@@ -276,22 +280,24 @@ public class DataUploader : MonoBehaviour
         { "ScaleX", posterScale.x },
         { "ScaleY", posterScale.y },
         { "ScaleZ", posterScale.z },
-        { "IsPrivate", false },
+        { "IsPrivate", _poster.isPosterPrivate },
         { "IsDeleted", false },
         { "Text", _poster.posterText },
         { "ImageUrl", _poster.posterImageUrl },
         { "TimeStamp",DateTime.Now.ToString() },
 };
+            Debug.Log("Poster Uploading...Poster Privacy : " + _poster.isPosterPrivate);
 
             colRef.AddAsync(poster).ContinueWithOnMainThread(task =>
             {
                 Debug.Log("Added data to the AllPostersData colection in the Square/ARPoster collection.");
                 _poster.PosterCurrentState = PosterState.Placed;
+                UIManager.Singleton.fuelingPanel.SetActive(false);
             });
         }
         
 
-        _poster.PosterCurrentState = PosterState.Placed;
+        //_poster.PosterCurrentState = PosterState.Placed;
         //yield return null;
 
     }
@@ -372,11 +378,13 @@ public class DataUploader : MonoBehaviour
         { "ScaleX", posterScale.x },
         { "ScaleY", posterScale.y },
         { "ScaleZ", posterScale.z },
-        { "IsPrivate", false },
+        { "IsPrivate", _poster.isPosterPrivate },
         { "IsDeleted", false },
         { "Text", _poster.posterText },
         { "ImageUrl", _poster.posterImageUrl },
+        { "TimeStamp",DateTime.Now.ToString() },
 };
+        Debug.Log("Poster Uploading...Poster Privacy : " + _poster.isPosterPrivate);
 
         colRef.AddAsync(poster).ContinueWithOnMainThread(task =>
         {

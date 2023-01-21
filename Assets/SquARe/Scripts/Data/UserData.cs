@@ -10,5 +10,7 @@ public static class UserData
     public static string userName = "";
     public static Texture2D userPic = null;
 
+    public static bool isDataSet = false;
+
     
 }

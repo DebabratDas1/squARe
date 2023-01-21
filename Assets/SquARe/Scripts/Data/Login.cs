@@ -7,6 +7,7 @@ using TMPro;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Firebase.Extensions;
+using AndroidNativeCore;
 
 public class Login : MonoBehaviour
 {
@@ -99,6 +100,9 @@ public class Login : MonoBehaviour
             if (!signedIn && user != null)
             {
                 Debug.Log("Signed out " + user.UserId);
+                auth = null;
+                UIManager.Singleton.CurrentUIState = UIStates.Login;
+
             }
             user = auth.CurrentUser;
             if (signedIn)
@@ -113,7 +117,7 @@ public class Login : MonoBehaviour
     void OnDestroy()
     {
         auth.StateChanged -= AuthStateChanged;
-        auth = null;
+       // auth = null;
     }
 
     public void GoogleSignInClick()
@@ -122,8 +126,35 @@ public class Login : MonoBehaviour
         GoogleSignIn.Configuration.UseGameSignIn = false;
         GoogleSignIn.Configuration.RequestIdToken = true;
         GoogleSignIn.Configuration.RequestEmail = true;
+        GoogleSignIn.DefaultInstance.EnableDebugLogging(true);
 
         GoogleSignIn.DefaultInstance.SignIn().ContinueWithOnMainThread(OnAuthenticationFinished);
+    }
+
+    public void OnClickSignOut()
+    {
+        AlertDialog alert = new AlertDialog();
+        alert.build(AlertDialog.THEME_HOLO_DARK)
+       .setTitle("Sign Out")
+       .setMessage("Do you really want to Sign Out?")
+       .setIcon("alert_icon")
+       .setNegativeButtion("Yes", () => {
+           //auth.SignOut();
+           GoogleSignIn.DefaultInstance.SignOut();
+           GoogleSignIn.DefaultInstance.Disconnect();
+           alert.dismiss();
+           
+           Debug.Log("Sign out...ABC");
+           //UserData.userID = "";
+           UIManager.Singleton.CurrentUIState = UIStates.Login;
+           Debug.Log("Sign out...DEF"+auth.CurrentUser.ToString());
+           RecentPosters.Singleton.ClearRecentPosters();
+       })
+       .setPositiveButtion("No", () => { alert.dismiss();})
+       //.setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked"); alert.dismiss(); })
+       .show();
+        //AddStatusText("Calling SignOut");
+        //GoogleSignIn.DefaultInstance.SignOut();
     }
 
     internal void OnAuthenticationFinished(Task<GoogleSignInUser> task)
@@ -244,6 +275,7 @@ public class Login : MonoBehaviour
                 userProfilePic.sprite = Sprite.Create(texture,
                     new Rect(0, 0, texture.width, texture.height),
                     new Vector2(0, 0));
+                UserData.isDataSet = true;
             }
         }
 

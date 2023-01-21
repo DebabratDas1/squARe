@@ -11,6 +11,7 @@ public class Poster : MonoBehaviour
     public string posterImageUrl = null;
     public string posterImagePath = null;
     public Texture2D posterImage = null;
+    public bool isPosterPrivate = false;
 
     public PosterState PosterCurrentState
     {

@@ -21,8 +21,26 @@ public class ARManager : MonoBehaviour
     [SerializeField] private GameObject arSession;
 
 
+
     public void EnableAR(bool val=true)
     {
-        arSession.SetActive(val);
+        //arSession.SetActive(val);
+    }
+
+    private bool isARSessionEnabled = false;
+    public void ChangeARSession()
+    {
+        if (arSession.activeInHierarchy)
+        {
+            isARSessionEnabled = true;
+        }
+        else
+        {
+            isARSessionEnabled = false;
+
+        }
+        isARSessionEnabled = !isARSessionEnabled;
+        arSession.SetActive(isARSessionEnabled);
+        Debug.Log("isARSessionEnabled" + isARSessionEnabled);
     }
 }

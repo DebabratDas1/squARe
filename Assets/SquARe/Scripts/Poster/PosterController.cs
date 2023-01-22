@@ -179,10 +179,13 @@ public class PosterController : MonoBehaviour
     {
         if (currentPoster != null && currentPoster.PosterCurrentState == PosterState.NotPlaced)
         {
+            instructionText.gameObject.SetActive(true);
             return true;
         }
         else
         {
+            instructionText.gameObject.SetActive(false);
+            
             return false;
         }
     }
@@ -200,6 +203,8 @@ public class PosterController : MonoBehaviour
         }
     }
 
+
+    [SerializeField] private TextMeshProUGUI instructionText;
 
     private void Update()
     {
@@ -407,6 +412,7 @@ public class PosterController : MonoBehaviour
         else
         {
             currentPoster.PosterCurrentState = PosterState.Placing;
+            UIManager.Singleton.StopPositioningHelpAudio();
             UIManager.Singleton.fuelingPanel.SetActive(true);
             DataUploader.Instance.UploadPoster1(currentPoster);
             //StartCoroutine(DataUploader.Instance.UploadPoster2(currentPoster));
@@ -478,6 +484,8 @@ public class PosterController : MonoBehaviour
 
         }
     }
+
+    
 
     
 

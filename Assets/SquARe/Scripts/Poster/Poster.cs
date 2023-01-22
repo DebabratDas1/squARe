@@ -1,3 +1,4 @@
+using AndroidNativeCore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,19 @@ public class Poster : MonoBehaviour
             
             ActivateConfirmPlaceButton();
 
-
+            if (posterCurrentState == PosterState.Positioning)
+            {
+                UIManager.Singleton.PlayPositioningHelpAudio();
+            }
+            if (posterCurrentState == PosterState.Placed)
+            {
+                AlertDialog alert = new AlertDialog();
+                alert.build(AlertDialog.THEME_HOLO_DARK)
+               .setTitle("Successfully Placed")
+               .setMessage("Poster has been placed successfully")
+               .setNeutralButtion("OK", () => { Debug.Log("Negitive btn clicked"); alert.dismiss(); })
+               .show();
+            }
         }
     }
 

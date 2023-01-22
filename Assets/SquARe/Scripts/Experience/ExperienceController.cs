@@ -18,6 +18,7 @@ public class ExperienceController : MonoBehaviour
 {
     public void EnterExperienceMode()
     {
+        
         ReadDatabase();
     }
 

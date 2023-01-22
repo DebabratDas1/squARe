@@ -86,17 +86,18 @@ public class UIManager : MonoBehaviour
         experiencePanel.SetActive(false);
         writepostPanel.SetActive(true);
         placePosterAnchorPanel.SetActive(false);
-        //ARManager.Singleton.EnableAR(false);
+        ARManager.Singleton.EnableAR(false);
     }
 
     private void StartPlacingAnchor()
     {
+        ARManager.Singleton.EnableAR();
+
         loginPanel.SetActive(false);
         homePanel.SetActive(false);
         experiencePanel.SetActive(false);
         writepostPanel.SetActive(false);
         placePosterAnchorPanel.SetActive(true);
-        //ARManager.Singleton.EnableAR();
     }
 
 
@@ -107,7 +108,7 @@ public class UIManager : MonoBehaviour
         experiencePanel.SetActive(false);
         writepostPanel.SetActive(false);
         placePosterAnchorPanel.SetActive(false);
-        //ARManager.Singleton.EnableAR(false);
+        ARManager.Singleton.EnableAR(false);
     }
 
     private void ShowHomePage()
@@ -120,18 +121,19 @@ public class UIManager : MonoBehaviour
         placePosterAnchorPanel.SetActive(false);
 
         ;// RecentPosters.Singleton.RefreshRecentposters();
-        //ARManager.Singleton.EnableAR(false);
+        ARManager.Singleton.EnableAR(false);
     }
 
     private void ShowExperiencePage()
     {
+        ARManager.Singleton.EnableAR();
+
         loginPanel.SetActive(false);
         homePanel.SetActive(false);
         experiencePanel.SetActive(true);
 
         writepostPanel.SetActive(false);
         placePosterAnchorPanel.SetActive(false);
-        //ARManager.Singleton.EnableAR(false);
     }
 
     public void OnClickUIStateButton(int _toState)
@@ -158,7 +160,17 @@ public class UIManager : MonoBehaviour
     [SerializeField] public GameObject fuelingPanel;
 
 
-    
+    [SerializeField] private AudioSource helpAudio;
+    public void PlayPositioningHelpAudio()
+    {
+        helpAudio.Stop();
+        helpAudio.Play();
+    }
+
+    public void StopPositioningHelpAudio()
+    {
+        helpAudio.Stop();
+    }
 }
 
 

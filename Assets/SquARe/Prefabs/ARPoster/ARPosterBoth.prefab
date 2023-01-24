@@ -451,7 +451,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &677885749544717497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -486,3 +486,4 @@ MonoBehaviour:
   posterImageUrl: 
   posterImagePath: 
   posterImage: {fileID: 0}
+  isPosterPrivate: 0

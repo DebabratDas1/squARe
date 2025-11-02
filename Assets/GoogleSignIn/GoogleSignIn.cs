@@ -66,9 +66,17 @@ namespace Google {
     public static GoogleSignInConfiguration Configuration {
       set {
         // Can set the configuration until the singleton is created.
-        if (theInstance == null || theConfiguration == value || theConfiguration == null) {
-          theConfiguration = value;
-        } else {
+        if (theInstance == null || theConfiguration == value || theConfiguration == null)
+        {
+                    if(theInstance!=null && theConfiguration == null)
+                    {
+                        // From sign out, Instance stays non-null but theConfiguration is null.\
+                        //Needs configuration refresh.
+                        theInstance.impl.Configure(value);
+                    }
+                    theConfiguration = value;
+        } 
+        else {
           throw new SignInException(GoogleSignInStatusCode.DeveloperError,
               "DefaultInstance already created. " +
               " Cannot change configuration after creation.");
@@ -115,10 +123,14 @@ namespace Google {
     /// the requested elements.
     /// </remarks>
     public Task<GoogleSignInUser> SignIn() {
+            Debug.Log("Inside GoogleSignIn.SignIn()");
       var tcs = new TaskCompletionSource<GoogleSignInUser>();
+            Debug.Log("After TaskCompletionSource.Google Sign In");
       SignInHelperObject.Instance.StartCoroutine(
         impl.SignIn().WaitForResult(tcs));
-      return tcs.Task;
+            Debug.Log("After SignInHelperObject.Google Sign In");
+
+            return tcs.Task;
     }
 
     /// <summary>Starts the silent authentication process.</summary>
@@ -142,6 +154,7 @@ namespace Google {
     /// </remarks>
     public void SignOut() {
       theConfiguration = null;
+            theInstance = null;
       impl.SignOut();
     }
 
@@ -198,5 +211,6 @@ namespace Google {
     void EnableDebugLogging(bool flag);
     void SignOut();
     void Disconnect();
+    void Configure(GoogleSignInConfiguration configuration);
   }
 }  // namespace Google

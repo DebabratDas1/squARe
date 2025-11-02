@@ -346,7 +346,7 @@ public class PosterController : MonoBehaviour
     public void OnClickSelectImage()
     {
         Texture2D texture = null;
-        NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
+        NativeGallery.GetImageFromGallery((path) =>
         {
             Debug.Log("Image path: " + path);
             if (path != null)

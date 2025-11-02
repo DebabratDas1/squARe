@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Firebase.Extensions;
 using AndroidNativeCore;
+using Google.Impl;
+using Firebase.Auth;
+
 
 public class Login : MonoBehaviour
 {
-    [SerializeField] private string webClientId = "<your client id here>";
+    [SerializeField] private string webClientId = "65968097671-duts45t9uhprqhp9vuvavdoclp0bv1m8.apps.googleusercontent.com";
 
     private GoogleSignInConfiguration configuration;
 
     Firebase.DependencyStatus dependencyStatus = Firebase.DependencyStatus.UnavailableOther;
     Firebase.Auth.FirebaseAuth auth;
     public Firebase.Auth.FirebaseUser user = null;
+    private bool isGoogleSignInInitialized = false;
 
     /*public bool isLoggedIn
     {
@@ -71,7 +75,9 @@ public class Login : MonoBehaviour
         configuration = new GoogleSignInConfiguration
         {
             WebClientId = webClientId,
-            RequestIdToken = true
+            RequestIdToken = true,
+            RequestEmail=true,
+         
         };
     }
 
@@ -83,9 +89,7 @@ public class Login : MonoBehaviour
 
     void InitFirebase()
     {
-
-
-        auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
 
@@ -117,7 +121,6 @@ public class Login : MonoBehaviour
     void OnDestroy()
     {
         auth.StateChanged -= AuthStateChanged;
-       // auth = null;
     }
 
     public void GoogleSignInClick()
@@ -129,6 +132,111 @@ public class Login : MonoBehaviour
         GoogleSignIn.DefaultInstance.EnableDebugLogging(true);
 
         GoogleSignIn.DefaultInstance.SignIn().ContinueWithOnMainThread(OnAuthenticationFinished);
+    }
+
+    private void GoogleLogin()
+    {
+
+        Debug.Log("Inside GoogleLogin ooo");
+        if (!isGoogleSignInInitialized)
+        {
+            Debug.Log("Inside GoogleLogin isGoogleSignInInitialized  false");
+
+            GoogleSignIn.Configuration = new GoogleSignInConfiguration
+            {
+                RequestIdToken = true,
+                WebClientId = webClientId,
+                RequestEmail = true
+            };
+
+            Debug.Log("Google Configuration Set  1111");
+
+            isGoogleSignInInitialized = true;
+            Debug.Log(" isGoogleSignInInitialized  true");
+
+        }
+
+        Debug.Log(" outside of IF isGoogleSignInInitialized");
+
+
+        /*GoogleSignIn.Configuration = new GoogleSignInConfiguration
+        {
+            RequestIdToken = true,
+            WebClientId = webClientId
+        };
+        Debug.Log("Google Configuration Set  2222");
+
+
+        GoogleSignIn.Configuration.RequestEmail = true;
+
+        Debug.Log("Google SIGN IN will be called");*/
+
+
+        Task<GoogleSignInUser> signIn = GoogleSignIn.DefaultInstance.SignIn();
+
+        Debug.Log("Google SIGN IN called");
+
+
+        TaskCompletionSource<FirebaseUser> signInCompleted = new TaskCompletionSource<FirebaseUser>();
+
+        Debug.Log(" TaskCompletionSource FirebaseUser declared");
+
+
+        signIn.ContinueWith(task =>
+        {
+            Debug.Log(" SignIn ContinueWith");
+
+            if (task.IsCanceled)
+            {
+                Debug.Log("Login ++++++++++++ Canceled");
+                signInCompleted.SetCanceled();
+            }
+            else if (task.IsFaulted)
+            {
+                Debug.Log("Login ++++++++++++ Faulted");
+                signInCompleted.SetException(task.Exception);
+
+                Debug.Log("Failed : " + task.Exception);
+            }
+            else
+            {
+                Debug.Log("Login Inside else block");
+                Credential credential = GoogleAuthProvider.GetCredential(task.Result.IdToken, null);
+
+                Debug.Log("Credential declared ");
+                    auth.SignInWithCredentialAsync(credential).ContinueWith(authTask =>
+                    {
+                        Debug.Log("Inside SignInWithCredentialAsync ContinueWith ");
+
+                        if (authTask.IsCanceled)
+                        {
+                            Debug.Log("Inside authTask iscancelled");
+                            signInCompleted.SetCanceled();
+                        }
+                        else if (authTask.IsFaulted)
+                        {
+                            Debug.Log("Inside authTask isfaulted");
+
+                            signInCompleted.SetException(authTask.Exception);
+                            Debug.Log("Faulted in auth " + authTask.Exception);
+                        }
+                        else
+                        {
+                            Debug.Log("Inside authTask else block");
+
+                            signInCompleted.SetResult(((Task<FirebaseUser>)authTask).Result);
+                            Debug.Log("Success");
+
+                            user = auth.CurrentUser;
+
+                            Debug.Log("User has been set");
+                            SetProfileData();
+
+                            Debug.Log("SetProfileData called");
+                        }
+                    });
+            }
+        });
     }
 
     public void OnClickSignOut()
@@ -159,9 +267,25 @@ public class Login : MonoBehaviour
 
     internal void OnAuthenticationFinished(Task<GoogleSignInUser> task)
     {
+        Debug.Log("Inside OnAuthenticationFinished");
         if (task.IsFaulted)
         {
-            Debug.Log("Fault");
+            Debug.Log("Fault "+task.Status.ToString());
+
+            using (System.Collections.Generic.IEnumerator<System.Exception> enumerator =
+               task.Exception.InnerExceptions.GetEnumerator())
+            {
+                if (enumerator.MoveNext())
+                {
+                    GoogleSignIn.SignInException error =
+                                (GoogleSignIn.SignInException)enumerator.Current;
+
+                    // CRITICAL: Log the error Status code
+                    Debug.LogError("Google Sign-In FAILURE! Status Code: " + error.Status +
+                                   " | Message: " + error.Message);
+                }
+            }
+
         }
         else if (task.IsCanceled)
         {
@@ -169,9 +293,15 @@ public class Login : MonoBehaviour
         }
         else
         {
+            Debug.Log("Inside OnAuthenticationFinished else");
+
             Firebase.Auth.Credential credential = Firebase.Auth.GoogleAuthProvider.GetCredential(task.Result.IdToken, null);
+            Debug.Log("Inside OnAuthenticationFinished After Authentication credential");
+
             auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
             {
+                Debug.Log("Inside SignInWithCredentialAsync ");
+
                 if (task.IsCanceled)
                 {
                     Debug.Log("SignInwithCredentialAsync was cancelled");

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 public class ARManager : MonoBehaviour
 {
@@ -15,10 +16,11 @@ public class ARManager : MonoBehaviour
         {
             Singleton = this;
         }
+        LoaderUtility.Deinitialize();
     }
 
 
-    [SerializeField] private GameObject arSession;
+    [SerializeField] private ARSession arSession;
 
 
 
@@ -30,7 +32,7 @@ public class ARManager : MonoBehaviour
     private bool isARSessionEnabled = false;
     public void ChangeARSession()
     {
-        if (arSession.activeInHierarchy)
+        if (arSession.gameObject.activeInHierarchy)
         {
             isARSessionEnabled = true;
         }
@@ -40,7 +42,7 @@ public class ARManager : MonoBehaviour
 
         }
         isARSessionEnabled = !isARSessionEnabled;
-        arSession.SetActive(isARSessionEnabled);
+        arSession.gameObject.SetActive(isARSessionEnabled);
         Debug.Log("isARSessionEnabled" + isARSessionEnabled);
     }
 }
